@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PharmIQ Dashboard — Multi-Agent HTA Intelligence | Simon-Kucher</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=IBM+Plex+Serif:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+</head>
+<body class="dashboard-page">
+
+  <!-- ============ SIDEBAR (Simon-Kucher) ============ -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <svg viewBox="0 0 44 44" width="38" height="38" aria-hidden="true">
+        <rect x="2" y="2" width="40" height="40" rx="6" fill="#0B2B4E"/>
+        <path d="M11 28 Q 16 14, 22 22 T 33 16" stroke="#E8B33B" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="33" cy="16" r="2.6" fill="#E8B33B"/>
+      </svg>
+      <div>
+        <div class="sb-title">Simon-Kucher</div>
+        <div class="sb-sub">PharmIQ</div>
+      </div>
+    </div>
+
+    <nav class="sb-nav">
+      <a class="active" href="#"><i class="fas fa-gauge-high"></i><span>Dashboard</span></a>
+      <a href="#"><i class="fas fa-folder-tree"></i><span>Projects</span></a>
+      <a href="#"><i class="fas fa-vial-circle-check"></i><span>Analogs Library</span></a>
+      <a href="#"><i class="fas fa-chart-line"></i><span>Pricing Models</span></a>
+      <a href="#"><i class="fas fa-file-shield"></i><span>HTA Records</span></a>
+      <a href="#"><i class="fas fa-gear"></i><span>Settings</span></a>
+    </nav>
+
+    <div class="sb-agents">
+      <div class="sb-agent-title">ACTIVE AGENTS</div>
+      <div class="sb-agent"><span class="dot live"></span> Orchestrator</div>
+      <div class="sb-agent"><span class="dot live"></span> Research</div>
+      <div class="sb-agent"><span class="dot live"></span> Pricing</div>
+      <div class="sb-agent"><span class="dot live"></span> Recommendation</div>
+      <div class="sb-agent"><span class="dot live"></span> Analog</div>
+    </div>
+
+    <a class="sb-back" href="index.html"><i class="fas fa-arrow-left"></i> New analysis</a>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main-area">
+
+    <!-- Header bar -->
+    <header class="dash-header">
+      <div class="crumbs">
+        <i class="fas fa-folder-open"></i>
+        <span>Projects</span>
+        <i class="fas fa-chevron-right"></i>
+        <span class="current" id="crumbProduct">Product Analysis</span>
+      </div>
+      <div class="header-actions">
+        <button class="hbtn"><i class="fas fa-file-export"></i> Export brief</button>
+        <button class="hbtn primary"><i class="fas fa-share-nodes"></i> Share</button>
+        <div class="user-pill">
+          <div class="avatar">SK</div>
+          <div>
+            <div class="user-name">Lead Strategist</div>
+            <div class="user-role">Life Sciences</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Body: chat + dashboard split -->
+    <div class="body-split">
+
+      <!-- ===== CHAT ===== -->
+      <section class="chat-pane">
+        <div class="chat-head">
+          <div>
+            <h3><i class="fas fa-comments"></i> AI Co-Pilot</h3>
+            <p>Ask any agent about findings, evidence, or pricing logic.</p>
+          </div>
+          <div class="agent-tag" id="activeAgent"><i class="fas fa-user-tie"></i> Orchestrator</div>
+        </div>
+
+        <div class="chat-stream" id="chatStream"></div>
+
+        <div class="chat-suggest" id="chatSuggest">
+          <button data-q="Why did you predict this likely Reject?">Why this prediction?</button>
+          <button data-q="Walk me through the price range rationale.">Price rationale</button>
+          <button data-q="Top 3 evidence gaps to flip from Reject to Accept?">Evidence gaps</button>
+          <button data-q="Compare us to the closest analog.">Closest analog</button>
+        </div>
+
+        <form class="chat-input" id="chatForm">
+          <i class="fas fa-paperclip attach"></i>
+          <input type="text" id="chatInput" placeholder="Ask the agents… (e.g. ‘How does our ICER compare?’)" autocomplete="off" />
+          <button type="submit" aria-label="Send"><i class="fas fa-paper-plane"></i></button>
+        </form>
+      </section>
+
+      <!-- ===== DASHBOARD ===== -->
+      <section class="dash-pane">
+
+        <!-- Top row: 2 columns -->
+        <div class="dash-top-row">
+
+          <!-- LEFT: Product info & analysis -->
+          <article class="card product-card">
+            <div class="card-head">
+              <div>
+                <div class="card-eyebrow"><i class="fas fa-prescription-bottle-medical"></i> YOUR PRODUCT</div>
+                <h2 id="productName">Somnexa-450 (lemborexant-XR)</h2>
+                <div class="tag-row">
+                  <span class="tag" id="indicationTag">Chronic Insomnia</span>
+                  <span class="tag muted" id="moaTag">DORA — Dual Orexin Receptor Antagonist</span>
+                  <span class="tag muted" id="phaseTag">Phase III completed</span>
+                </div>
+              </div>
+              <div class="agent-stamp"><i class="fas fa-microscope"></i> Research Agent</div>
+            </div>
+
+            <div class="kpi-row">
+              <div class="kpi"><div class="kpi-label">Efficacy</div><div class="kpi-val" id="kpiEff">82</div><div class="kpi-bar"><span style="width:82%"></span></div></div>
+              <div class="kpi"><div class="kpi-label">Safety</div><div class="kpi-val" id="kpiSaf">76</div><div class="kpi-bar"><span style="width:76%"></span></div></div>
+              <div class="kpi"><div class="kpi-label">Innovation</div><div class="kpi-val" id="kpiInn">68</div><div class="kpi-bar"><span style="width:68%"></span></div></div>
+              <div class="kpi"><div class="kpi-label">Unmet Need</div><div class="kpi-val" id="kpiUnm">71</div><div class="kpi-bar"><span style="width:71%"></span></div></div>
+            </div>
+
+            <div class="prod-grid">
+              <div>
+                <h4>Indication & Population</h4>
+                <p id="popText">Adults (≥18) with chronic insomnia disorder per DSM-5; ≥3 nights/week for ≥3 months. Estimated UK eligible population: 1.2M.</p>
+              </div>
+              <div>
+                <h4>Mechanism & Differentiation</h4>
+                <p id="diffText">Extended-release dual orexin receptor antagonist; non-GABAergic; lower next-day residual sedation vs. existing analogs.</p>
+              </div>
+              <div>
+                <h4>Primary Endpoints</h4>
+                <p id="epText">SOL, WASO, sTST at 4 weeks (vs placebo); ISI score change at 12 weeks.</p>
+              </div>
+              <div>
+                <h4>Search Criteria (NICE)</h4>
+                <ul class="crit-list" id="critList">
+                  <li>Indication: Insomnia / Sleep disorders</li>
+                  <li>Class: Orexin receptor antagonists</li>
+                  <li>Comparators: Z-drugs, melatonin agonists</li>
+                  <li>Outcome: PRO + objective sleep metrics</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="prod-chart-wrap">
+              <h4>Value-driver radar vs. closest analog</h4>
+              <div class="chart-host"><canvas id="radarChart"></canvas></div>
+            </div>
+          </article>
+
+          <!-- RIGHT: Recommendation (price + accept/reject) -->
+          <article class="card reco-card">
+            <div class="card-head">
+              <div>
+                <div class="card-eyebrow"><i class="fas fa-lightbulb"></i> RECOMMENDATION</div>
+                <h2>HTA Verdict & Price Corridor</h2>
+              </div>
+              <div class="agent-stamp double">
+                <span><i class="fas fa-coins"></i> Pricing</span>
+                <span><i class="fas fa-lightbulb"></i> Recommendation</span>
+              </div>
+            </div>
+
+            <!-- Prediction + Price -->
+            <div class="verdict-grid">
+              <div class="verdict-block predict" id="predictBlock">
+                <div class="vb-label">NICE Prediction</div>
+                <div class="vb-value" id="predictVal">Conditional Accept</div>
+                <div class="vb-meta">Confidence <strong id="predictConf">68%</strong></div>
+                <div class="vb-meter"><span id="predictMeter" style="width:68%"></span></div>
+              </div>
+
+              <div class="verdict-block price">
+                <div class="vb-label">Recommended price (annual / patient)</div>
+                <div class="price-range">
+                  <span class="p-low" id="priceLow">£3,200</span>
+                  <span class="p-dash">—</span>
+                  <span class="p-high" id="priceHigh">£4,800</span>
+                </div>
+                <div class="price-bar-wrap">
+                  <div class="price-bar">
+                    <div class="pb-fill" id="pbFill"></div>
+                    <div class="pb-anchor" id="pbAnchor" title="Analog median"></div>
+                  </div>
+                  <div class="price-axis">
+                    <span>£0</span><span>£2k</span><span>£4k</span><span>£6k</span><span>£8k</span>
+                  </div>
+                </div>
+                <div class="vb-meta">Anchor: analog median <strong id="anchorVal">£3,950</strong> · ICER target <strong>£24k/QALY</strong></div>
+              </div>
+            </div>
+
+            <!-- Rationale -->
+            <div class="rationale">
+              <h4><i class="fas fa-scale-balanced"></i> Rationale</h4>
+              <ul id="rationaleList">
+                <li><strong>Strengths:</strong> Differentiated MoA vs Z-drugs, meaningful WASO reduction (−42 min vs placebo), favourable next-day cognition profile.</li>
+                <li><strong>Concerns:</strong> Comparator choice is placebo-only; lack of head-to-head vs lemborexant IR raises NICE relative-effectiveness flag.</li>
+                <li><strong>ICER projection:</strong> £26.4k/QALY at midpoint price — borderline against the £30k threshold; sensitive to discontinuation rate.</li>
+              </ul>
+            </div>
+
+            <!-- Evidence to add -->
+            <div class="evidence-box">
+              <h4><i class="fas fa-microscope"></i> Evidence to add — to flip toward <span class="accent">Accept</span></h4>
+              <ol class="evidence-list" id="evidenceList">
+                <li>
+                  <span class="ev-prio high">High</span>
+                  <div>
+                    <strong>Indirect treatment comparison (ITC) vs. lemborexant IR &amp; daridorexant.</strong>
+                    Reduces relative-effectiveness uncertainty; expected verdict shift +14%.
+                  </div>
+                </li>
+                <li>
+                  <span class="ev-prio high">High</span>
+                  <div>
+                    <strong>Real-world discontinuation evidence (≥26 weeks).</strong>
+                    NICE ERG flagged adherence as key driver of cost-effectiveness.
+                  </div>
+                </li>
+                <li>
+                  <span class="ev-prio med">Med</span>
+                  <div>
+                    <strong>UK-specific utility weights (EQ-5D-5L) in chronic insomnia.</strong>
+                    Replaces US-mapped utilities and improves QALY robustness.
+                  </div>
+                </li>
+                <li>
+                  <span class="ev-prio med">Med</span>
+                  <div>
+                    <strong>Subgroup analysis: elderly (≥65) and shift workers.</strong>
+                    Aligns with NICE scope and supports PAS structure.
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </article>
+        </div>
+
+        <!-- BOTTOM: Analogs analysis -->
+        <article class="card analogs-card">
+          <div class="card-head">
+            <div>
+              <div class="card-eyebrow"><i class="fas fa-clone"></i> ANALOGS · NICE</div>
+              <h2>Ranked analog products</h2>
+              <p class="card-sub">Ranked by similarity, weighted by indication match and comparator overlap. All decisions linked to NICE source pages.</p>
+            </div>
+            <div class="filter-row">
+              <label>Sort
+                <select id="sortAnalogs">
+                  <option value="similarity">Similarity ↓</option>
+                  <option value="indication">Indication match</option>
+                  <option value="year">Most recent</option>
+                  <option value="decision">NICE decision</option>
+                </select>
+              </label>
+              <label>Indication
+                <select id="filterInd">
+                  <option value="all">All indications</option>
+                  <option value="match">Same indication only</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <div class="analog-meta">
+            <div class="am-item"><span class="am-label">Analogs found</span><span class="am-val" id="amCount">8</span></div>
+            <div class="am-item"><span class="am-label">Same indication</span><span class="am-val" id="amInd">5</span></div>
+            <div class="am-item"><span class="am-label">Median ICER</span><span class="am-val" id="amIcer">£23.8k</span></div>
+            <div class="am-item"><span class="am-label">Acceptance rate</span><span class="am-val" id="amAcc">62%</span></div>
+          </div>
+
+          <div class="analog-list" id="analogList">
+            <!-- rendered by JS -->
+          </div>
+        </article>
+
+      </section>
+    </div>
+  </main>
+
+  <script src="js/agents.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
