@@ -1,0 +1,1 @@
+# SK_heckthon_G6_AI
